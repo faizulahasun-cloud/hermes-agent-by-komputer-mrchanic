@@ -1,1 +1,1 @@
-# hermes-agent-by-komputer-mrchanic
+# hermes-agent-by-komputer-mechanic
