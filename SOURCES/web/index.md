@@ -40,3 +40,20 @@ Every source is a node, not an endpoint. Inspect links, repositories, profiles/c
 - Tonbi Module 5 X edition: https://x.com/tonbistudio/status/2091607893896503499 — Providers & Models; later text edition with detailed provider/model/local-model/proxy material.
 - Tonbi Module 6 YouTube: https://www.youtube.com/watch?v=U140gP-1bEI — Tools & MCP Servers; exact video URL verified.
 - Tonbi cross-agent workflow lead: https://www.youtube.com/ — "I Built an Autonomous Cross-Agent Workflow (ClaudeCode to Hermes and Back)", exact video URL still to be verified.
+
+
+## Komputer Mechanic Hermes corpus
+
+Primary creator/tutorial hub: https://komputermechanic.com/
+
+High-value Hermes sources:
+- https://komputermechanic.com/tutorials/hermes-agent-tips — persistent agents, dedicated memory, Telegram topic routing, quiet Cron.
+- https://komputermechanic.com/tutorials/hermes-dashboard — Orchestrator + persistent specialists + mission control.
+- https://komputermechanic.com/tutorials/hermes-mission-control — 5-agent Telegram fleet.
+- https://komputermechanic.com/tutorials/hermes-personal-assistant — chief-of-staff architecture and productivity integrations.
+- https://komputermechanic.com/tutorials/ai-job-hunting-agent — strict specialist boundaries and cheap-first pipeline.
+- https://komputermechanic.com/tutorials/how-to-give-ai-agents-persistent-memory — durable shared knowledge/wiki architecture.
+- https://komputermechanic.com/tutorials/hermes-agent-mission-control-dashboard-3 — current fleet mission control, voice, shell and Agent City.
+- https://komputermechanic.com/tutorials/how-to-build-a-premium-3d-website-with-hermes-agent — Hermes coding/build workflow with visual verification.
+
+See SOURCES/web/komputer-mechanic/hermes-agent-corpus/ for normalized extraction.
