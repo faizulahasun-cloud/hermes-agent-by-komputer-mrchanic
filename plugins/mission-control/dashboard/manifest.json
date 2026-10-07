@@ -1,0 +1,1 @@
+{"name":"mission-control","label":"Mission Control","description":"Operator control plane for Hermes fleets, missions and approvals.","icon":"Activity","version":"0.1.0","tab":{"path":"/mission-control","position":"after:sessions"},"entry":"dist/index.js","css":"dist/style.css","api":"plugin_api.py"}

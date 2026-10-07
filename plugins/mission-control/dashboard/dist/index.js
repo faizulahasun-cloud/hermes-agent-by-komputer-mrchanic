@@ -1,0 +1,28 @@
+(function(){
+"use strict";
+const SDK=window.__HERMES_PLUGIN_SDK__,R=SDK.React,H=SDK.hooks,C=SDK.components,h=R.createElement;
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function streamChat(id,input,onDelta){
+ const headers={"Content-Type":"application/json"}; const token=window.__HERMES_SESSION_TOKEN__; if(token)headers["X-Hermes-Session-Token"]=token;
+ const res=await fetch("/api/sessions/"+encodeURIComponent(id)+"/chat/stream",{method:"POST",headers,credentials:"include",body:JSON.stringify({input})});
+ if(!res.ok)throw new Error("Chat failed: "+res.status);
+ const reader=res.body.getReader(),dec=new TextDecoder();let buf="";
+ while(true){const x=await reader.read();if(x.done)break;buf+=dec.decode(x.value,{stream:true});const parts=buf.split("\n\n");buf=parts.pop()||"";for(const p of parts){const line=p.split("\n").find(v=>v.startsWith("data:"));if(!line)continue;const raw=line.slice(5).trim();if(!raw||raw==="[DONE]")continue;try{const ev=JSON.parse(raw);if(ev.type==="assistant.delta")onDelta(ev.text||ev.delta||"");else if(ev.type==="assistant.completed")onDelta("\\n"+(ev.text||ev.content||""));}catch{}}}
+}
+function App(){
+ const [profiles,setProfiles]=H.useState([]),[sessions,setSessions]=H.useState([]),[cron,setCron]=H.useState([]),[missions,setMissions]=H.useState([]),[title,setTitle]=H.useState(""),[goal,setGoal]=H.useState(""),[chat,setChat]=H.useState([]),[input,setInput]=H.useState(""),[session,setSession]=H.useState(null),[busy,setBusy]=H.useState(false),[error,setError]=H.useState("");
+ const refresh=H.useCallback(async()=>{try{const [p,s,c,m]=await Promise.all([SDK.api.getProfiles(),SDK.api.getSessions(20,0,"", "recent"),SDK.api.getCronJobs("all"),SDK.fetchJSON("/api/plugins/mission-control/missions")]);setProfiles(p.profiles||[]);setSessions(s.sessions||[]);setCron(c||[]);setMissions(m.missions||[]);setError("")}catch(e){setError(String(e.message||e))}},[]);
+ H.useEffect(()=>{refresh()},[refresh]);
+ const newChat=async()=>{const x=await SDK.fetchJSON("/api/sessions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:"Mission Control Chat",source:"api-server"})});setSession(x);setChat([])};
+ const send=async()=>{const q=input.trim();if(!q||busy)return;if(!session)await newChat();const s=session||await SDK.fetchJSON("/api/sessions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:"Mission Control Chat",source:"api-server"})});setInput("");setChat(v=>[...v,{role:"user",text:q},{role:"assistant",text:""}]);setBusy(true);try{let text="";await streamChat(s.id,q,t=>{text+=t;setChat(v=>{const a=v.slice();a[a.length-1]={role:"assistant",text};return a})})}catch(e){setChat(v=>[...v,{role:"error",text:e.message}])}finally{setBusy(false)}};
+ const createMission=async()=>{if(!title.trim()||!goal.trim())return;await SDK.fetchJSON("/api/plugins/mission-control/missions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,goal,plan:[],profile:profiles[0]?.name||null})});setTitle("");setGoal("");await refresh()};
+ const dispatch=async m=>{try{const o=await SDK.fetchJSON("/api/plugins/kanban/orchestration");const assignee=o.default_assignee||o.orchestrator_profile||profiles[0]?.name;const r=await SDK.fetchJSON("/api/plugins/kanban/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:m.title,body:m.goal,assignee,triage:false,goal_mode:true,idempotency_key:"mission-"+m.id})});await SDK.fetchJSON("/api/plugins/mission-control/missions/"+m.id+"/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task_id:r.task?.id||null})});await refresh()}catch(e){setError(String(e.message||e))}};
+ return h("div",{className:"mc-wrap"},
+  h("div",{className:"mc-grid"},...[["PROFILES",profiles.length],["SESSIONS",sessions.length],["CRON",cron.length],["MISSIONS",missions.length]].map(x=>h("div",{className:"mc-card",key:x[0]},h("div",{className:"mc-muted"},x[0]),h("div",{className:"mc-number"},String(x[1]))))),
+  h("div",{className:"mc-card"},h("div",{className:"mc-title"},"Operator chat"),h("div",{className:"mc-muted"},"Direct Hermes conversation. No Telegram required."),h("div",{className:"mc-chat"},chat.map((x,i)=>h("div",{key:i,className:"mc-msg "+x.role},h("b",null,x.role.toUpperCase()),h("div",{style:{whiteSpace:"pre-wrap"}},x.text)))),h("div",{className:"mc-command"},h("input",{className:"mc-input",value:input,onChange:e=>setInput(e.target.value),onKeyDown:e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}},placeholder:"One prompt…"}),h(C.Button,{onClick:send,disabled:busy},busy?"Working…":"Send"),h(C.Button,{onClick:newChat},"New chat"))),
+  h("div",{className:"mc-card"},h("div",{className:"mc-title"},"New mission"),h("input",{className:"mc-input",value:title,onChange:e=>setTitle(e.target.value),placeholder:"Mission title"}),h("textarea",{className:"mc-input",value:goal,onChange:e=>setGoal(e.target.value),placeholder:"What should the fleet accomplish?"}),h(C.Button,{onClick:createMission},"Create approval draft")),
+  h("div",{className:"mc-card"},h("div",{className:"mc-title"},"Mission queue"),missions.length?missions.map(m=>h("div",{className:"mc-row",key:m.id},h("div",null,h("div",{className:"mc-title"},m.title),h("div",{className:"mc-muted"},m.goal),h("div",{className:"mc-status"},m.status)),m.status==="draft"?h(C.Button,{onClick:()=>dispatch(m)},"Approve & dispatch"):null)):h("div",{className:"mc-muted"},"No missions yet.")),
+  error?h("div",{className:"mc-error"},error):null
+ )}
+window.__HERMES_PLUGINS__.register("mission-control",App);
+})();
