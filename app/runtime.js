@@ -88,7 +88,7 @@ const Runtime = (() => {
   const createSession = async title => { const r = await request("/api/sessions", {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title })
-  });
+  }); };
   const chatStream = (id, input, onEvent) =>
     stream("/api/sessions/" + encodeURIComponent(id) + "/chat/stream", { input }, onEvent);
   const cron = () => request("/api/jobs");
