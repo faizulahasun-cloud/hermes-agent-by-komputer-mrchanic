@@ -19,8 +19,8 @@ Last checked: 2026-10-07.
 | 2 | Deploy to VPS, Connect to Telegram, Discord, etc. | https://www.youtube.com/watch?v=dcXmUUZvDLE | 2026-05-11 | verified |
 | 3 | Memory, Plugins, Honcho, and Obsidian | https://www.youtube.com/watch?v=ZKZLko9kLm4 | 2026-05-18 | verified |
 | 4 | Skills | https://www.youtube.com/watch?v=L3WdVeMaYZM | 2026-05-25 | verified |
-| 5 | Models / Providers | playlist expansion needed | 2026-06 | discovered, URL not yet verified |
-| 6 | Tools / MCP | playlist expansion needed | 2026-06 | discovered, URL not yet verified |
+| 5 | Providers & Models | https://x.com/tonbistudio/status/2091607893896503499 | 2026-08-23 (X edition) | verified | Later X edition of the masterclass module; original video URL still to be verified |
+| 6 | Tools & MCP Servers | https://www.youtube.com/watch?v=U140gP-1bEI | 2026-06-12 | verified | Exact YouTube URL verified |
 | 7 | Cron and Automation | https://www.youtube.com/watch?v=grMNnzCv2gY | 2026-06-19 | verified |
 | 8 | Subagents & Delegation | https://www.youtube.com/watch?v=_6DtQkDpcEs | 2026-06-26 | verified |
 | 9 | Profiles & Kanban | https://www.youtube.com/watch?v=KPsMThlFb8Y | 2026-07-03 | verified |
@@ -36,6 +36,8 @@ Note: Module 1 was later updated in July 2026. Updated Module 1: https://www.you
 | P1 | Hermes Agent Crash Course for Beginners | https://www.youtube.com/watch?v=4sAmpcSOVEw | verified | Adrian Twarog; broad feature walkthrough |
 | P1 | Hermes Agent in 10 Minutes | https://www.youtube.com/watch?v=BeWUUclCin0 | verified | Tonbi / Onchain AI Garage |
 | P1 | How Hermes Agent Actually Works | https://youtu.be/LoPCOlwSLJo | community | Vivek Shetye; architecture and profiles/workspaces/sandboxes |
+| P1 | How to Build a Multi-Agent Workflow for LLM Wikis in Hermes Kanban | https://www.youtube.com/watch?v=REQUIRES_VIDEO_ID | discovered | Tonbi; Hermes Kanban multi-agent workflow; exact YouTube ID still needs verification |
+| P1 | I Built an Autonomous Cross-Agent Workflow (ClaudeCode to Hermes and Back) | source catalog entry; exact URL needs verification | 2026-06-25 | discovered | Tonbi; cross-agent orchestration and audit/reconciliation workflow |
 | P1 | Existing repo video | https://youtu.be/h9SsHkRSHxo?si=VReycEmIo7lyE6x- | preserved | Existing README link; classify during traversal |
 | P1 | Existing repo playlist | https://youtube.com/playlist?list=PL69yrflDdJUtHioazc_aBngQpxDYOJsqH&si=Y-y2_PJ7JKbxa9BJ | preserved | Existing README link; expand during traversal |
 
