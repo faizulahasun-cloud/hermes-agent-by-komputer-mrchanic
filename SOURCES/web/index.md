@@ -33,3 +33,10 @@ Last checked: 2026-10-07.
 ## Traversal rule
 
 Every source is a node, not an endpoint. Inspect links, repositories, profiles/config files, skills, videos/playlists, cited official documentation, and referenced creators. Add newly discovered Hermes-specific sources before producing derived knowledge.
+
+## Newly verified / high-value traversal sources
+
+- Hermes Bible video catalog: https://www.hermesbible.com/videos — community Hermes video index; useful for discovering creator videos and X/YouTube follow-ons.
+- Tonbi Module 5 X edition: https://x.com/tonbistudio/status/2091607893896503499 — Providers & Models; later text edition with detailed provider/model/local-model/proxy material.
+- Tonbi Module 6 YouTube: https://www.youtube.com/watch?v=U140gP-1bEI — Tools & MCP Servers; exact video URL verified.
+- Tonbi cross-agent workflow lead: https://www.youtube.com/ — "I Built an Autonomous Cross-Agent Workflow (ClaudeCode to Hermes and Back)", exact video URL still to be verified.
