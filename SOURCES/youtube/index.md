@@ -36,7 +36,6 @@ Note: Module 1 was later updated in July 2026. Updated Module 1: https://www.you
 | P1 | Hermes Agent Crash Course for Beginners | https://www.youtube.com/watch?v=4sAmpcSOVEw | verified | Adrian Twarog; broad feature walkthrough |
 | P1 | Hermes Agent in 10 Minutes | https://www.youtube.com/watch?v=BeWUUclCin0 | verified | Tonbi / Onchain AI Garage |
 | P1 | How Hermes Agent Actually Works | https://youtu.be/LoPCOlwSLJo | community | Vivek Shetye; architecture and profiles/workspaces/sandboxes |
-| P1 | How to Build a Multi-Agent Workflow for LLM Wikis in Hermes Kanban | https://www.youtube.com/watch?v=REQUIRES_VIDEO_ID | discovered | Tonbi; Hermes Kanban multi-agent workflow; exact YouTube ID still needs verification |
 | P1 | I Built an Autonomous Cross-Agent Workflow (ClaudeCode to Hermes and Back) | source catalog entry; exact URL needs verification | 2026-06-25 | discovered | Tonbi; cross-agent orchestration and audit/reconciliation workflow |
 | P1 | Existing repo video | https://youtu.be/h9SsHkRSHxo?si=VReycEmIo7lyE6x- | preserved | Existing README link; classify during traversal |
 | P1 | Existing repo playlist | https://youtube.com/playlist?list=PL69yrflDdJUtHioazc_aBngQpxDYOJsqH&si=Y-y2_PJ7JKbxa9BJ | preserved | Existing README link; expand during traversal |
