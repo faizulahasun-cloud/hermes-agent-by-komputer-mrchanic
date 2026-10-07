@@ -1,5 +1,5 @@
 /* Hermes Mission Control runtime adapter.
- * Uses Hermes' native dashboard/API surfaces. No agent runtime is reimplemented here.
+ * Uses Hermes' native API-server surface. No agent runtime is reimplemented here.
  */
 const Runtime = (() => {
   const key = "hermes-mission-control.connection";
@@ -10,50 +10,90 @@ const Runtime = (() => {
     catch { return { ...defaults }; }
   }
 
-  async function request(path, options = {}) {
+  function save(cfg) {
+    localStorage.setItem(key, JSON.stringify({ ...defaults, ...cfg }));
+  }
+
+  function url(path) {
+    return load().baseUrl.replace(/\/$/, "") + path;
+  }
+
+  function headers(extra = {}) {
     const cfg = load();
-    const headers = { Accept: "application/json", ...(options.headers || {}) };
-    if (cfg.apiKey) headers.Authorization = "Bearer " + cfg.apiKey;
-    const res = await fetch(cfg.baseUrl.replace(/\/$/, "") + path, { ...options, headers });
-    if (!res.ok) throw new Error("Hermes API " + res.status + " at " + path);
+    return {
+      Accept: "application/json",
+      ...(cfg.apiKey ? { Authorization: "Bearer " + cfg.apiKey } : {}),
+      ...extra
+    };
+  }
+
+  async function request(path, options = {}) {
+    const res = await fetch(url(path), { ...options, headers: headers(options.headers || {}) });
+    if (!res.ok) {
+      let detail = "";
+      try { detail = (await res.json()).detail || ""; } catch {}
+      throw new Error("Hermes API " + res.status + " at " + path + (detail ? ": " + detail : ""));
+    }
     return res.json();
   }
-  async function status() {
-    return request("/v1/capabilities");
-  }
 
-  async function sessions(limit = 20) {
-    return request("/api/sessions?limit=" + encodeURIComponent(limit));
-  }
-
-  async function session(id) {
-    return request("/api/sessions/" + encodeURIComponent(id));
-  }
-
-  async function messages(id) {
-    return request("/api/sessions/" + encodeURIComponent(id) + "/messages");
-  }
-
-  async function chat(id, input) {
-    return request("/api/sessions/" + encodeURIComponent(id) + "/chat/stream", {
+  async function stream(path, body, onEvent) {
+    const res = await fetch(url(path), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input })
+      headers: headers({ "Content-Type": "application/json" }),
+      body: JSON.stringify(body)
     });
+    if (!res.ok) {
+      let detail = "";
+      try { detail = (await res.json()).detail || ""; } catch {}
+      throw new Error("Hermes API " + res.status + " at " + path + (detail ? ": " + detail : ""));
+    }
+    if (!res.body) throw new Error("Hermes returned no streaming body");
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    const consume = text => {
+      buffer += text;
+      const frames = buffer.split(/\r?\n\r?\n/);
+      buffer = frames.pop() || "";
+      for (const frame of frames) {
+        if (!frame || frame.trimStart().startsWith(":")) continue;
+        let eventName = "";
+        const data = [];
+        for (const line of frame.split(/\r?\n/)) {
+          if (line.startsWith("event:")) eventName = line.slice(6).trim();
+          else if (line.startsWith("data:")) data.push(line.slice(5).trimStart());
+        }
+        if (!data.length) continue;
+        const raw = data.join("\n");
+        if (raw === "[DONE]") continue;
+        try { onEvent(JSON.parse(raw), eventName); } catch {}
+      }
+    };
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      consume(decoder.decode(value, { stream: true }));
+    }
+    consume(decoder.decode());
   }
 
-  async function cron() {
-    return request("/api/cron/jobs");
-  }
+  const status = () => request("/v1/capabilities");
+  const sessions = (limit = 20) => request("/api/sessions?limit=" + encodeURIComponent(limit));
+  const session = id => request("/api/sessions/" + encodeURIComponent(id));
+  const messages = id => request("/api/sessions/" + encodeURIComponent(id) + "/messages");
+  const createSession = title => request("/api/sessions", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title })
+  });
+  const chatStream = (id, input, onEvent) =>
+    stream("/api/sessions/" + encodeURIComponent(id) + "/chat/stream", { input }, onEvent);
+  const cron = () => request("/api/jobs");
+  const analytics = (days = 7) => request("/api/analytics/usage?days=" + encodeURIComponent(days));
+  const logs = (lines = 100) => request("/api/logs?lines=" + encodeURIComponent(lines));
 
-  async function analytics(days = 7) {
-    return request("/api/analytics/usage?days=" + days);
-  }
-
-  async function logs(lines = 100) {
-    return request("/api/logs?lines=" + lines);
-  }
-
-  return { load, save(cfg) { localStorage.setItem(key, JSON.stringify({ ...defaults, ...cfg })); },
-    status, sessions, session, messages, chat, cron, analytics, logs };
+  return { load, save, request, stream, status, sessions, session, messages, createSession, chatStream, cron, analytics, logs };
 })();
