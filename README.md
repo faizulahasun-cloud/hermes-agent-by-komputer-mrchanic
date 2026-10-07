@@ -17,3 +17,41 @@ Start here: [SOURCES/README.md](SOURCES/README.md)
 - https://youtube.com/playlist?list=PL69yrflDdJUtHioazc_aBngQpxDYOJsqH&si=Y-y2_PJ7JKbxa9BJ
 
 The collection process follows links recursively: source -> linked videos/playlists -> linked websites/repos/profiles -> extracted prompts/profiles/workflows -> derived knowledge.
+
+## Mission Control application
+
+The canonical operator navigation is:
+
+```
+MISSION CONTROL
+│
+├── 🖥 Cockpit
+│
+├── 👥 Fleet
+│   └── Agent Detail
+│
+├── 🎯 Missions
+│   └── Mission Detail
+│
+├── 📋 Tasks / Kanban
+│
+├── 💬 Communication
+│
+├── 🗨 Sessions / Chat
+│
+├── ⚡ Activity
+│
+├── 📁 Files
+│
+├── ⌨ Shell
+│
+├── ⏰ Schedules
+│
+├── ❤️ Health
+│
+├── 🌐 Agent City
+│
+└── 🎙 Voice
+```
+
+Agent Detail belongs under Fleet and Mission Detail belongs under Missions. This surface map is the application information-architecture contract. Hermes remains the runtime authority for agents, profiles, sessions, tools, Kanban, schedules and machine state; Mission Control presents and controls those capabilities without creating a second agent runtime.
