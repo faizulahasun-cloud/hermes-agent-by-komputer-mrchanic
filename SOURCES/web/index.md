@@ -57,3 +57,21 @@ High-value Hermes sources:
 - https://komputermechanic.com/tutorials/how-to-build-a-premium-3d-website-with-hermes-agent — Hermes coding/build workflow with visual verification.
 
 See SOURCES/web/komputer-mechanic/hermes-agent-corpus/ for normalized extraction.
+
+## Official Hermes documentation corpus collected in this branch
+
+The machine-readable official index now exposes a much larger current surface than the earlier seed list. Collected/normalized high-value nodes include:
+- https://hermes-agent.nousresearch.com/docs/user-guide/which-file-does-what
+- https://hermes-agent.nousresearch.com/docs/user-guide/windows-native
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/provider-routing
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/fallback-providers
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/browser
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/goals
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/loops
+- https://hermes-agent.nousresearch.com/docs/reference/skills-catalog
+- https://hermes-agent.nousresearch.com/docs/reference/optional-skills-catalog
+
+The official machine-readable index also routes into the developer architecture, gateway internals, prompt assembly, provider runtime, plugin system, memory providers, programmatic APIs, messaging adapters, automation blueprints, and the current bundled/optional skill trees. See SOURCES/web/nousresearch/hermes-docs/ for normalized extractions.
