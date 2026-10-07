@@ -54,6 +54,7 @@ High-value Hermes sources:
 - https://komputermechanic.com/tutorials/ai-job-hunting-agent — strict specialist boundaries and cheap-first pipeline.
 - https://komputermechanic.com/tutorials/how-to-give-ai-agents-persistent-memory — durable shared knowledge/wiki architecture.
 - https://komputermechanic.com/tutorials/hermes-agent-mission-control-dashboard-3 — current fleet mission control, voice, shell and Agent City.
+- Repository-local normalized catalog: SOURCES/web/komputer-mechanic/hermes-agent-corpus/catalog.md
 - https://komputermechanic.com/tutorials/how-to-build-a-premium-3d-website-with-hermes-agent — Hermes coding/build workflow with visual verification.
 
 See SOURCES/web/komputer-mechanic/hermes-agent-corpus/ for normalized extraction.
