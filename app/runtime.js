@@ -83,9 +83,9 @@ const Runtime = (() => {
 
   const status = () => request("/v1/capabilities");
   const sessions = (limit = 20) => request("/api/sessions?limit=" + encodeURIComponent(limit));
-  const session = id => request("/api/sessions/" + encodeURIComponent(id));
+  const session = async id => { const r = await request("/api/sessions/" + encodeURIComponent(id)); return r.session || r; };
   const messages = id => request("/api/sessions/" + encodeURIComponent(id) + "/messages");
-  const createSession = title => request("/api/sessions", {
+  const createSession = async title => { const r = await request("/api/sessions", {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title })
   });
