@@ -1,0 +1,38 @@
+name: Mission Control validation
+
+on:
+  push:
+    paths:
+      - "app/**"
+      - "plugins/mission-control/**"
+      - ".github/workflows/mission-control-validation.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "plugins/mission-control/**"
+      - ".github/workflows/mission-control-validation.yml"
+
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check app/runtime.js
+          node --check app/app.js
+          node --check plugins/mission-control/dashboard/dist/index.js
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile plugins/mission-control/dashboard/plugin_api.py
+
+      - name: Validate JSON manifests
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          json.loads(Path("plugins/mission-control/dashboard/manifest.json").read_text())
+          print("manifest.json: valid")
+          PY
