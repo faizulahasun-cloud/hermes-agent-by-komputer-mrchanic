@@ -25,7 +25,7 @@ def db():
     )""")
     return con
 
-class MissionIn(BaseModel):
+class MissionApproval(BaseModel):\n    task_id: str | None = None\n\nclass MissionIn(BaseModel):
     title: str
     goal: str
     plan: list[str] = []
@@ -64,7 +64,7 @@ def approve_mission(mission_id: int):
         con.commit()
         if cur.rowcount != 1:
             raise HTTPException(409, "Mission is not in draft state")
-        return {"ok": True, "status": "approved"}
+        return {"ok": True, "status": "approved", "task_id": body.task_id if body else None}
     finally:
         con.close()
 
