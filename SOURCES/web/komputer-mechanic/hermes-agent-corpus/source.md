@@ -55,3 +55,14 @@ Mission-control tutorials repeatedly use owner -> orchestrator -> persistent spe
 The job-hunting tutorial gives especially clear role boundaries: Forge coordinates, Scout searches/ranks, Job Reader handles one selected job description, and CV Adapter structures/tailors only from verified CV facts.
 
 This repository records evidence and concise extracted patterns, not complete paid/downloadable prompt packs.
+## 2026-10-07 verification additions
+
+The current Komputer Mechanic tutorial index confirms the Hermes corpus is still expanding. The October 2026 "Hermes Agent Tips: 7 Upgrades for Your AI Agent Team" is explicitly framed around specialist crews, model/effort selection, memory surviving compaction, scheduled work that only pings when useful, safe tool connections, multiple Hermes setups on one server, and mission control.
+
+Mission Control 3.0 now documents a fleet with EXECUTOR, persistent specialists, missions with approval, agent-to-agent visibility, files, shell, voice, Agent City, health, schedules, and existing-crew integration. Its current update notes include Windows character-encoding fixes and mission approval fixes.
+
+The persistent-memory build is especially relevant to the repository's context-collection architecture: a shared Markdown wiki separates processed knowledge from raw source material, distinguishes the user's world from outside claims, teaches agents to read before answering and write after real work, adds ingestion/nightly maintenance, and uses Git as the safety net. It also explicitly warns that per-profile Hermes homes can make a path such as ~/wiki resolve to different physical directories, so a shared wiki path must be pinned when profiles/containers differ.
+
+The 5-agent Mission Control tutorial confirms the recurring creator pattern: one Telegram Orchestrator owns outcomes, four persistent specialists have isolated memory/workspaces, role boundaries are explicit, every specialist can have a dedicated Telegram route, and the dashboard reads Hermes data while logging, tasks, content, and Cron remain observable.
+
+Evidence: PUBLISHED. Complete paid/downloadable prompt packs remain excluded; only concise factual extraction and short patterns are retained.
