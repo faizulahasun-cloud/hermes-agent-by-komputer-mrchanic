@@ -15,8 +15,33 @@ async function refreshRuntime(){try{const [s,c]=await Promise.all([api("/api/ses
 window.connectRuntime=async()=>{Runtime.save({baseUrl:document.querySelector("#base-url")?.value.trim(),apiKey:document.querySelector("#api-key")?.value.trim()});await refreshRuntime();render()};
 window.newSession=newSession;window.sendChat=sendChat;
 function agents(){return card('<div class="card-head"><h2>Fleet control</h2><span class="pill">HERMES NATIVE</span></div><div class="notice">Agent conversations now run directly through Hermes sessions. Fleet/profile aggregation is the next control-plane layer.</div>')}
+async function communications(){
+  let board={columns:{},assignees:[]};
+  try{board=await api("/api/plugins/kanban/board?include_archived=false")}catch(e){return card('<div class="card-head"><h2>Agent Communications</h2><span class="pill">OFFLINE</span></div><div class="notice">Kanban communication endpoint unavailable: '+esc(e.message)+'</div>')}
+  const tasks=Object.values(board.columns||{}).flat();
+  const active=tasks.filter(t=>["ready","running","blocked","review","done"].includes(t.status)).slice(0,30);
+  return '<div class="card"><div class="card-head"><h2>Agent Communications</h2><span class="pill">NATIVE KANBAN</span></div><div class="notice">This is the actual Hermes inter-agent communication layer. Messages are durable Kanban task comments and handoff events, not fake UI messages.</div>'+
+    active.map(t=>'<div class="source-row"><div><div class="source-type">'+esc(t.assignee||"UNASSIGNED")+'</div><div class="source-title">'+esc(t.title||t.id)+'</div><div class="muted">'+esc(t.status||"")+' · '+esc(t.id||"")+'</div></div><button onclick="openThread(\''+esc(t.id||"")+'\')">Open thread</button></div>').join("")+
+    (active.length?"":"<div class=\"notice\">No collaborative tasks yet.</div>")+'</div><div id="thread"></div>';
+}
+window.openThread=async(id)=>{
+  const box=document.querySelector("#thread"); if(!box)return;
+  try{
+    const t=await api("/api/plugins/kanban/tasks/"+encodeURIComponent(id));
+    const comments=t.comments||[];
+    box.innerHTML='<div class="card" style="margin-top:14px"><div class="card-head"><h2>'+esc(t.title||id)+'</h2><span class="pill">'+esc(t.assignee||"UNASSIGNED")+'</span></div>'+
+      '<div style="max-height:360px;overflow:auto">'+comments.map(x=>'<div class="source-row"><div class="source-type">'+esc(x.author||"AGENT")+'</div><div class="source-title" style="white-space:pre-wrap">'+esc(x.body||"")+'</div></div>').join("")+
+      (comments.length?"":"<div class="notice">No messages yet.</div>")+'</div>'+
+      '<div class="command"><input id="thread-msg" placeholder="Send message to this task thread…" onkeydown="if(event.key===\'Enter\')sendThread(\''+esc(id)+'\')"><button onclick="sendThread(\''+esc(id)+'\')">Send</button></div></div>';
+  }catch(e){box.innerHTML=card('<div class="notice">'+esc(e.message)+'</div>')}
+};
+window.sendThread=async(id)=>{
+  const el=document.querySelector("#thread-msg"),body=el?.value.trim();if(!body)return;
+  await api("/api/plugins/kanban/tasks/"+encodeURIComponent(id)+"/comments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body,author:"mission-control"})});
+  await openThread(id);
+};
 function missions(){return card('<div class="card-head"><h2>Missions</h2><span class="pill">CONTROL LAYER</span></div><div class="notice">Mission lifecycle remains separate from direct chat: draft → plan → approval → execution → report.</div>')}
 function sources(){return card('<div class="card-head"><h2>Sources</h2><span class="pill">PROVENANCE</span></div>'+state.sources.map(s=>'<div class="source-row"><div class="source-type">'+s.type+'</div><div><div class="source-title">'+esc(s.title)+'</div><div class="source-url">'+esc(s.path)+'</div></div><span class="pill">'+s.status+'</span></div>').join(""))}
 function workflows(){return card('<div class="card-head"><h2>Mission Control</h2><span class="pill">LIVE CHAT FIRST</span></div><div class="notice">Direct conversation is implemented through Hermes native session APIs. Telegram remains optional.</div>')}
-async function render(){await refreshRuntime();const views={overview,agents,missions,sources,workflows};title.textContent=state.view[0].toUpperCase()+state.view.slice(1);app.innerHTML=views[state.view]();document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===state.view))}
+async function render(){await refreshRuntime();const views={overview,agents,communications,missions,sources,workflows};title.textContent=state.view[0].toUpperCase()+state.view.slice(1);app.innerHTML=views[state.view]();document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===state.view))}
 document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>{state.view=b.dataset.view;render()});document.querySelector("#refresh").onclick=render;render();
