@@ -14,10 +14,40 @@ async function refreshRuntime(){try{state.capabilities=await Runtime.status();co
 window.connectRuntime=async()=>{Runtime.save({baseUrl:document.querySelector("#base-url")?.value.trim(),apiKey:document.querySelector("#api-key")?.value.trim()});await render()};
 window.newSession=newSession;window.sendChat=sendChat;
 function agents(){return card('<div class="card-head"><h2>Fleet control</h2><span class="pill">HERMES NATIVE</span></div><div class="notice">Sessions are read directly from Hermes. Profile/fleet views must use Hermes capabilities rather than demo agent records.</div>')}
-async function communications(){let board;try{board=await api("/api/plugins/kanban/board?include_archived=false")}catch(e){return card('<div class="card-head"><h2>Agent Communications</h2><span class="pill">UNAVAILABLE</span></div><div class="notice">Native Kanban unavailable: '+esc(e.message)+'</div>')}const tasks=(board.columns||[]).flatMap(c=>c.tasks||[]);const active=tasks.filter(t=>["ready","running","blocked","review","done"].includes(t.status)).slice(0,30);return '<div class="card"><div class="card-head"><h2>Agent Communications</h2><span class="pill">NATIVE KANBAN</span></div><div class="notice">Durable Hermes task comments are the communication thread. No fake messages are generated.</div>'+active.map(t=>'<div class="source-row"><div><div class="source-type">'+esc(t.assignee||"UNASSIGNED")+'</div><div class="source-title">'+esc(t.title||t.id)+'</div><div class="muted">'+esc(t.status||"")+' · '+esc(t.id||"")+'</div></div><button onclick="openThread(\''+esc(t.id||"")+'\')">Open thread</button></div>').join("")+(active.length?"":"<div class="notice">No collaborative tasks yet.</div>")+'</div><div id="thread"></div>'}
-window.openThread=async(id)=>{const box=document.querySelector("#thread");if(!box)return;try{const t=await api("/api/plugins/kanban/tasks/"+encodeURIComponent(id));const task=t.task||t;const comments=t.comments||[];box.innerHTML='<div class="card" style="margin-top:14px"><div class="card-head"><h2>'+esc(task.title||id)+'</h2><span class="pill">'+esc(task.assignee||"UNASSIGNED")+'</span></div><div style="max-height:360px;overflow:auto">'+comments.map(x=>'<div class="source-row"><div class="source-type">'+esc(x.author||"AGENT")+'</div><div class="source-title" style="white-space:pre-wrap">'+esc(x.body||"")+'</div></div>').join("")+(comments.length?"":"<div class="notice">No messages yet.</div>")+'</div><div class="command"><input id="thread-msg" placeholder="Send message to this task thread…" onkeydown="if(event.key===\'Enter\')sendThread(\''+esc(id)+'\')"><button onclick="sendThread(\''+esc(id)+'\')">Send</button></div></div>'}catch(e){box.innerHTML=card('<div class="notice">'+esc(e.message)+'</div>')}}
+async function communications(){
+  let board;
+  try {
+    board=await api("/api/plugins/kanban/board?include_archived=false");
+  } catch(e) {
+    return card("<div class=\"card-head\"><h2>Agent Communications</h2><span class=\"pill\">UNAVAILABLE</span></div><div class=\"notice\">Native Kanban unavailable: "+esc(e.message)+"</div>");
+  }
+  const tasks=(board.columns||[]).flatMap(c=>c.tasks||[]);
+  const active=tasks.filter(t=>["ready","running","blocked","review","done"].includes(t.status)).slice(0,30);
+  const rows=active.map(t=>"<div class=\"source-row\"><div><div class=\"source-type\">"+esc(t.assignee||"UNASSIGNED")+"</div><div class=\"source-title\">"+esc(t.title||t.id)+"</div><div class=\"muted\">"+esc(t.status||"")+" · "+esc(t.id||"")+"</div></div><button onclick=\"openThread('"+esc(t.id||"")+"')\">Open thread</button></div>").join("");
+  return "<div class=\"card\"><div class=\"card-head\"><h2>Agent Communications</h2><span class=\"pill\">NATIVE KANBAN</span></div><div class=\"notice\">Durable Hermes task comments are the communication thread. No fake messages are generated.</div>"+rows+(active.length?"":"<div class=\"notice\">No collaborative tasks yet.</div>")+"</div><div id=\"thread\"></div>";
+}
+window.openThread=async(id)=>{
+  const box=document.querySelector("#thread");
+  if(!box)return;
+  try{
+    const t=await api("/api/plugins/kanban/tasks/"+encodeURIComponent(id));
+    const task=t.task||t;
+    const comments=t.comments||[];
+    const rows=comments.map(x=>"<div class=\"source-row\"><div class=\"source-type\">"+esc(x.author||"AGENT")+"</div><div class=\"source-title\" style=\"white-space:pre-wrap\">"+esc(x.body||"")+"</div></div>").join("");
+    box.innerHTML="<div class=\"card\" style=\"margin-top:14px\"><div class=\"card-head\"><h2>"+esc(task.title||id)+"</h2><span class=\"pill\">"+esc(task.assignee||"UNASSIGNED")+"</span></div><div style=\"max-height:360px;overflow:auto\">"+rows+(comments.length?"":"<div class=\"notice\">No messages yet.</div>")+"</div><div class=\"command\"><input id=\"thread-msg\" placeholder=\"Send message to this task thread…\" onkeydown=\"if(event.key==='Enter')sendThread('"+esc(id)+"')\"><button onclick=\"sendThread('"+esc(id)+"')\">Send</button></div></div>";
+  }catch(e){
+    box.innerHTML=card("<div class=\"notice\">"+esc(e.message)+"</div>");
+  }
+};
 window.sendThread=async(id)=>{const el=document.querySelector("#thread-msg"),body=el?.value.trim();if(!body)return;await api("/api/plugins/kanban/tasks/"+encodeURIComponent(id)+"/comments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body,author:"mission-control"})});await openThread(id)}
-async function missions(){let data;try{data=await api("/api/plugins/mission-control/missions")}catch(e){return card('<div class="card-head"><h2>Missions</h2><span class="pill">UNAVAILABLE</span></div><div class="notice">'+esc(e.message)+'</div>')}const ms=data.missions||[];return card('<div class="card-head"><h2>Missions</h2><span class="pill">APPROVAL GATE</span></div><div class="notice">Mission state is persistent. A draft cannot execute until explicitly approved.</div>'+ms.map(m=>'<div class="source-row"><div><div class="source-title">'+esc(m.title)+'</div><div class="muted">'+esc(m.goal)+'</div></div><span class="pill">'+esc(m.status)+'</span></div>').join("")+(ms.length?"":"<div class="notice">No missions yet.</div>"))}
+async function missions(){
+  let data;
+  try{data=await api("/api/plugins/mission-control/missions")}
+  catch(e){return card('<div class="card-head"><h2>Missions</h2><span class="pill">UNAVAILABLE</span></div><div class="notice">'+esc(e.message)+'</div>')}
+  const ms=data.missions||[];
+  const rows=ms.map(m=>'<div class="source-row"><div><div class="source-title">'+esc(m.title)+'</div><div class="muted">'+esc(m.goal)+'</div></div><span class="pill">'+esc(m.status)+'</span></div>').join("");
+  return card('<div class="card-head"><h2>Missions</h2><span class="pill">APPROVAL GATE</span></div><div class="notice">Mission state is persistent. A draft cannot execute until explicitly approved.</div>'+rows+(ms.length?'':'<div class="notice">No missions yet.</div>'));
+}
 function sources(){return card('<div class="card-head"><h2>Sources</h2><span class="pill">PROVENANCE</span></div>'+state.sources.map(s=>'<div class="source-row"><div class="source-type">'+s.type+'</div><div><div class="source-title">'+esc(s.title)+'</div><div class="source-url">'+esc(s.path)+'</div></div><span class="pill">'+s.status+'</span></div>').join(""))}
 function workflows(){return card('<div class="card-head"><h2>Mission Control</h2><span class="pill">RUNTIME</span></div><div class="notice">Native Hermes sessions, jobs, Kanban and API capabilities are the runtime substrate.</div>')}
 async function render(){await refreshRuntime();const views={overview,agents,communications,missions,sources,workflows};title.textContent=state.view[0].toUpperCase()+state.view.slice(1);const view=views[state.view];app.innerHTML=view?await view():"";document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===state.view))}
