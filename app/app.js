@@ -40,7 +40,14 @@ window.openThread=async(id)=>{
   }
 };
 window.sendThread=async(id)=>{const el=document.querySelector("#thread-msg"),body=el?.value.trim();if(!body)return;await api("/api/plugins/kanban/tasks/"+encodeURIComponent(id)+"/comments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body,author:"mission-control"})});await openThread(id)}
-async function missions(){let data;try{data=await api("/api/plugins/mission-control/missions")}catch(e){return card('<div class="card-head"><h2>Missions</h2><span class="pill">UNAVAILABLE</span></div><div class="notice">'+esc(e.message)+'</div>')}const ms=data.missions||[];return card('<div class="card-head"><h2>Missions</h2><span class="pill">APPROVAL GATE</span></div><div class="notice">Mission state is persistent. A draft cannot execute until explicitly approved.</div>'+ms.map(m=>'<div class="source-row"><div><div class="source-title">'+esc(m.title)+'</div><div class="muted">'+esc(m.goal)+'</div></div><span class="pill">'+esc(m.status)+'</span></div>').join("")+(ms.length?"":"<div class="notice">No missions yet.</div>"))}
+async function missions(){
+  let data;
+  try{data=await api("/api/plugins/mission-control/missions")}
+  catch(e){return card('<div class="card-head"><h2>Missions</h2><span class="pill">UNAVAILABLE</span></div><div class="notice">'+esc(e.message)+'</div>')}
+  const ms=data.missions||[];
+  const rows=ms.map(m=>'<div class="source-row"><div><div class="source-title">'+esc(m.title)+'</div><div class="muted">'+esc(m.goal)+'</div></div><span class="pill">'+esc(m.status)+'</span></div>').join("");
+  return card('<div class="card-head"><h2>Missions</h2><span class="pill">APPROVAL GATE</span></div><div class="notice">Mission state is persistent. A draft cannot execute until explicitly approved.</div>'+rows+(ms.length?'':'<div class="notice">No missions yet.</div>'));
+}
 function sources(){return card('<div class="card-head"><h2>Sources</h2><span class="pill">PROVENANCE</span></div>'+state.sources.map(s=>'<div class="source-row"><div class="source-type">'+s.type+'</div><div><div class="source-title">'+esc(s.title)+'</div><div class="source-url">'+esc(s.path)+'</div></div><span class="pill">'+s.status+'</span></div>').join(""))}
 function workflows(){return card('<div class="card-head"><h2>Mission Control</h2><span class="pill">RUNTIME</span></div><div class="notice">Native Hermes sessions, jobs, Kanban and API capabilities are the runtime substrate.</div>')}
 async function render(){await refreshRuntime();const views={overview,agents,communications,missions,sources,workflows};title.textContent=state.view[0].toUpperCase()+state.view.slice(1);const view=views[state.view];app.innerHTML=view?await view():"";document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===state.view))}
