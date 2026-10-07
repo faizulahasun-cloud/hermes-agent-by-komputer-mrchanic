@@ -18,8 +18,7 @@ const Runtime = (() => {
     if (!res.ok) throw new Error("Hermes API " + res.status + " at " + path);
     return res.json();
   }
-
-  async function request(path, options = {}) { const cfg = load(); const headers = { Accept: "application/json", ...(options.headers || {}) }; if (cfg.apiKey) headers.Authorization = "Bearer " + cfg.apiKey; const res = await fetch(cfg.baseUrl.replace(/\/$/, "") + path, { ...options, headers }); if (!res.ok) throw new Error("Hermes API " + res.status + " at " + path); return res.json(); }\n\n  async function status() {
+  async function status() {
     return request("/v1/capabilities");
   }
 
